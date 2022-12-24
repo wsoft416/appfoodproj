@@ -52,11 +52,12 @@ class CartContainer extends StatefulWidget {
 
 class _CartContainerState extends State<CartContainer> {
   late CartBloc bloc;
-  late int iTongTien = 0;
+  late int iTongTien;
 
   @override
   void initState() {
     super.initState();
+    iTongTien = 0;
     bloc = context.read();
     bloc.eventSink.add(FetchCartEvent());
   }
@@ -83,13 +84,14 @@ class _CartContainerState extends State<CartContainer> {
                   Expanded(
                       flex: 1,
                       child: Container(
-                        margin: EdgeInsets.symmetric(horizontal: 20),
-                        child: _summaryCart(iTongTien.toString()),
-                      )),
+                          margin: EdgeInsets.symmetric(horizontal: 20),
+                          child: Padding(
+                              padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+                              child: _summaryCart(iTongTien.toString())))),
                   Expanded(
                       flex: 1,
                       child: Padding(
-                        padding: ,
+                          padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
                           child: Container(
                               margin: EdgeInsets.symmetric(horizontal: 20),
                               child: SizedBox(
@@ -100,7 +102,7 @@ class _CartContainerState extends State<CartContainer> {
                                   },
                                   child: Text("Tạo đơn hàng",
                                       style: TextStyle(
-                                          fontSize: 14,
+                                          fontSize: 16,
                                           fontWeight: FontWeight.bold,
                                           color: Colors.black)),
                                 ),
@@ -108,11 +110,96 @@ class _CartContainerState extends State<CartContainer> {
                 ],
               );
             } else {
-              return Container();
+              return _showEmpty();
             }
           }),
       LoadingWidget(child: Container(), bloc: bloc),
+      ProgressListenerWidget<CartBloc>(
+        child: Container(),
+        callback: (event) {
+          switch (event.runtimeType) {
+            case SuccessEvent:
+              showSnackBar(context, "Tạo đơn hàng thành công");
+              break;
+            case FailEvent:
+              showSnackBar(context, (event as FailEvent).message);
+              break;
+          }
+        },
+      )
     ]);
+  }
+
+  Widget _showEmpty() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        Flexible(
+          flex: 1,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Text(
+                "Chi tiết đơn hàng",
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black),
+              ),
+              Text(
+                "Giỏ hàng của bạn không có sản phẩm",
+                style: TextStyle(fontSize: 15, color: Colors.black),
+              ),
+            ],
+          ),
+        ),
+        Flexible(
+            flex: 4,
+            child: Image.asset(
+              "assets/images/cart48.png",
+              width: 200,
+            ))
+      ],
+    );
+  }
+
+  Widget _buildQuanlityCart(int iSoluong) {
+    return Container(
+        child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        SizedBox(
+          width: 30,
+          height: 30,
+          child: TextButton(
+            onPressed: () {
+              //bloc.eventSink.add(DecreaseCartItemEvent(id, 1));
+            },
+            child: Text(
+              "-",
+              style: TextStyle(fontSize: 14),
+            ),
+          ),
+        ),
+        Text(
+          iSoluong.toString(),
+          style: TextStyle(fontSize: 12, color: Colors.black),
+        ),
+        SizedBox(
+          width: 30,
+          height: 30,
+          child: TextButton(
+            onPressed: () {
+              //bloc.eventSink.add(IncreaseCartItemEvent(id, 1));
+            },
+            child: Text(
+              "+",
+              style: TextStyle(fontSize: 14),
+            ),
+          ),
+        ),
+      ],
+    ));
   }
 
   Widget _showCartInfo(Product? product) {
@@ -148,27 +235,7 @@ class _CartContainerState extends State<CartContainer> {
                       ),
                       Text("Giá : ${formatPrice(product.price)} đ",
                           style: TextStyle(fontSize: 12)),
-                      ElevatedButton(
-                        onPressed: () {
-                          // bloc.eventSink
-                          //     .add(AddToCart(idProduct: product.id.toString()));
-                        },
-                        style: ButtonStyle(
-                            backgroundColor:
-                                MaterialStateProperty.resolveWith((states) {
-                              if (states.contains(MaterialState.pressed)) {
-                                return Color.fromARGB(200, 240, 102, 61);
-                              } else {
-                                return Color.fromARGB(230, 240, 102, 61);
-                              }
-                            }),
-                            shape: MaterialStateProperty.all(
-                                RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.all(
-                                        Radius.circular(10))))),
-                        child:
-                            Text("Add To Cart", style: TextStyle(fontSize: 14)),
-                      ),
+                      _buildQuanlityCart(product.quantity)
                     ],
                   ),
                 ),
@@ -199,12 +266,12 @@ class _CartContainerState extends State<CartContainer> {
           children: [
             Text("Tổng tiền :",
                 style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Colors.black)),
             Text(_iTongTien,
                 style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Colors.black)),
           ],

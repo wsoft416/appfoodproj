@@ -109,7 +109,7 @@ class _HomeContainerState extends State<HomeContainer> {
           children: [
             Expanded(
                 flex: 1,
-                child: Text("Food",
+                child: Text("Món ăn",
                     textAlign: TextAlign.center,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -209,8 +209,8 @@ class _HomeContainerState extends State<HomeContainer> {
                                 RoundedRectangleBorder(
                                     borderRadius: BorderRadius.all(
                                         Radius.circular(10))))),
-                        child:
-                            Text("Add To Cart", style: TextStyle(fontSize: 14)),
+                        child: Text("Thêm giỏ hàng",
+                            style: TextStyle(fontSize: 14)),
                       ),
                     ],
                   ),
