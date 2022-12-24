@@ -3,9 +3,12 @@ import 'dart:ffi';
 
 import 'package:appp_sale_29092022/common/bases/base_bloc.dart';
 import 'package:appp_sale_29092022/common/bases/base_event.dart';
+import 'package:appp_sale_29092022/common/constants/variable_constant.dart';
+import 'package:appp_sale_29092022/data/datasources/local/cache/app_cache.dart';
 import 'package:appp_sale_29092022/data/datasources/remote/dto/app_resource.dart';
 import 'package:appp_sale_29092022/data/datasources/remote/dto/cart_dto.dart';
 import 'package:appp_sale_29092022/data/datasources/remote/dto/product_dto.dart';
+import 'package:appp_sale_29092022/data/model/cart.dart';
 import 'package:appp_sale_29092022/data/model/product.dart';
 import 'package:appp_sale_29092022/data/repositories/product_repository.dart';
 import 'package:appp_sale_29092022/presentation/features/cart/cart_event.dart';
@@ -15,6 +18,9 @@ class CartBloc extends BaseBloc {
   Stream<List<Product>> get products => _listCartController.stream;
 
   late ProductRepository _productRepository;
+  late int iTotalMoney = 0;
+
+  int getTotalMoney() => iTotalMoney;
 
   void updateProductRepo(ProductRepository productRepository) {
     _productRepository = productRepository;
@@ -26,6 +32,12 @@ class CartBloc extends BaseBloc {
       case FetchCartEvent:
         _executeGetCart(event as FetchCartEvent);
         break;
+      case UpdateCart:
+        _executeUpdateCart(event as UpdateCart);
+        break;
+      case ConfirmCart:
+        _executeConfirmCart(event as ConfirmCart);
+        break;
     }
   }
 
@@ -36,6 +48,12 @@ class CartBloc extends BaseBloc {
       if (resCarttDTO.data == null) return;
 
       CartDTO cartDTO = resCarttDTO.data!;
+      //set cache
+      AppCache.setString(
+          key: VariableConstant.CART_ID, value: cartDTO.id.toString());
+
+      iTotalMoney = cartDTO.price!;
+
       List<ProductDTO> listProductDTO =
           ProductDTO.parserListProducts(cartDTO.products!) ?? List.empty();
       List<Product> listProduct = listProductDTO.map((e) {
@@ -46,6 +64,34 @@ class CartBloc extends BaseBloc {
       loadingSink.add(false);
     } catch (e) {
       messageSink.add(e.toString());
+      loadingSink.add(false);
+    }
+  }
+
+  void _executeUpdateCart(UpdateCart event) async {
+    loadingSink.add(true);
+    try {
+      AppResource<CartDTO> resourceCartDTO =
+          await _productRepository.updateCart(event.idProduct, event.Quantity);
+      if (resourceCartDTO.data == null) return;
+      progressSink.add(SuccessEvent());
+      loadingSink.add(false);
+    } catch (e) {
+      progressSink.add(FailEvent(message: e.toString()));
+      loadingSink.add(false);
+    }
+  }
+
+  void _executeConfirmCart(ConfirmCart event) async {
+    loadingSink.add(true);
+    try {
+      AppResource<CartDTO> resourceCartDTO =
+          await _productRepository.confirmCart(event.status);
+      if (resourceCartDTO.data == null) return;
+      progressSink.add(SuccessEvent());
+      loadingSink.add(false);
+    } catch (e) {
+      progressSink.add(FailEvent(message: e.toString()));
       loadingSink.add(false);
     }
   }

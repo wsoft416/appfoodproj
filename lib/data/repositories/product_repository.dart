@@ -59,4 +59,51 @@ class ProductRepository {
     }
     return completer.future;
   }
+
+  Future<AppResource<CartDTO>> updateCart(
+      String idProduct, int quantity) async {
+    Completer<AppResource<CartDTO>> completer = Completer();
+    try {
+      Response<dynamic> response =
+          await _apiRequest.updateCart(idProduct, quantity);
+      AppResource<CartDTO> resourceCartDTO =
+          AppResource.fromJson(response.data, CartDTO.fromJson);
+      completer.complete(resourceCartDTO);
+    } on DioError catch (dioError) {
+      completer.completeError(dioError.response?.data["message"]);
+    } catch (e) {
+      completer.completeError(e.toString());
+    }
+    return completer.future;
+  }
+
+  Future<AppResource<CartDTO>> confirmCart(bool status) async {
+    Completer<AppResource<CartDTO>> completer = Completer();
+    try {
+      Response<dynamic> response = await _apiRequest.confirmCart(status);
+      AppResource<CartDTO> resourceCartDTO =
+          AppResource.fromJson(response.data, CartDTO.fromJson);
+      completer.complete(resourceCartDTO);
+    } on DioError catch (dioError) {
+      completer.completeError(dioError.response?.data["message"]);
+    } catch (e) {
+      completer.completeError(e.toString());
+    }
+    return completer.future;
+  }
+
+  Future<AppResource<List<CartDTO>>> historyCart() async {
+    Completer<AppResource<List<CartDTO>>> completer = Completer();
+    try {
+      Response<dynamic> response = await _apiRequest.getHistoryCart();
+      AppResource<List<CartDTO>> resourceCartDTO =
+          AppResource.fromJson(response.data, CartDTO.getListCartDTO);
+      completer.complete(resourceCartDTO);
+    } on DioError catch (dioError) {
+      completer.completeError(dioError.response?.data["message"]);
+    } catch (e) {
+      completer.completeError(e.toString());
+    }
+    return completer.future;
+  }
 }

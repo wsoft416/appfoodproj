@@ -8,4 +8,7 @@ class ApiConstant {
   static final String PRODUCTS = "product";
   static final String ADD_CART = "cart/add";
   static final String GET_CART = "cart";
+  static final String CONFIRM_CART = "cart/conform";
+  static final String HISTORY_CART = "order/history";
+  static final String UPDATE_CART = "cart/update";
 }

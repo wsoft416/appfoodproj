@@ -52,12 +52,10 @@ class CartContainer extends StatefulWidget {
 
 class _CartContainerState extends State<CartContainer> {
   late CartBloc bloc;
-  late int iTongTien;
 
   @override
   void initState() {
     super.initState();
-    iTongTien = 0;
     bloc = context.read();
     bloc.eventSink.add(FetchCartEvent());
   }
@@ -87,7 +85,7 @@ class _CartContainerState extends State<CartContainer> {
                           margin: EdgeInsets.symmetric(horizontal: 20),
                           child: Padding(
                               padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
-                              child: _summaryCart(iTongTien.toString())))),
+                              child: _summaryCart()))),
                   Expanded(
                       flex: 1,
                       child: Padding(
@@ -98,7 +96,8 @@ class _CartContainerState extends State<CartContainer> {
                                 width: 150,
                                 child: ElevatedButton(
                                   onPressed: () {
-                                    //bloc.eventSink.add(ConfirmCartEvent());
+                                    bloc.eventSink
+                                        .add(ConfirmCart(status: true));
                                   },
                                   child: Text("Tạo đơn hàng",
                                       style: TextStyle(
@@ -114,19 +113,19 @@ class _CartContainerState extends State<CartContainer> {
             }
           }),
       LoadingWidget(child: Container(), bloc: bloc),
-      ProgressListenerWidget<CartBloc>(
-        child: Container(),
-        callback: (event) {
-          switch (event.runtimeType) {
-            case SuccessEvent:
-              showSnackBar(context, "Tạo đơn hàng thành công");
-              break;
-            case FailEvent:
-              showSnackBar(context, (event as FailEvent).message);
-              break;
-          }
-        },
-      )
+      // ProgressListenerWidget<CartBloc>(
+      //   child: Container(),
+      //   callback: (event) {
+      //     switch (event.runtimeType) {
+      //       case SuccessEvent:
+      //         showSnackBar(context, "Tạo đơn hàng thành công");
+      //         break;
+      //       case FailEvent:
+      //         showSnackBar(context, (event as FailEvent).message);
+      //         break;
+      //     }
+      //   },
+      // )
     ]);
   }
 
@@ -163,7 +162,7 @@ class _CartContainerState extends State<CartContainer> {
     );
   }
 
-  Widget _buildQuanlityCart(int iSoluong) {
+  Widget _buildQuanlityCart(String id, int soluong) {
     return Container(
         child: Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -173,7 +172,8 @@ class _CartContainerState extends State<CartContainer> {
           height: 30,
           child: TextButton(
             onPressed: () {
-              //bloc.eventSink.add(DecreaseCartItemEvent(id, 1));
+              bloc.eventSink
+                  .add(UpdateCart(idProduct: id, Quantity: soluong - 1));
             },
             child: Text(
               "-",
@@ -182,7 +182,7 @@ class _CartContainerState extends State<CartContainer> {
           ),
         ),
         Text(
-          iSoluong.toString(),
+          soluong.toString(),
           style: TextStyle(fontSize: 12, color: Colors.black),
         ),
         SizedBox(
@@ -190,7 +190,8 @@ class _CartContainerState extends State<CartContainer> {
           height: 30,
           child: TextButton(
             onPressed: () {
-              //bloc.eventSink.add(IncreaseCartItemEvent(id, 1));
+              bloc.eventSink
+                  .add(UpdateCart(idProduct: id, Quantity: soluong + 1));
             },
             child: Text(
               "+",
@@ -204,7 +205,7 @@ class _CartContainerState extends State<CartContainer> {
 
   Widget _showCartInfo(Product? product) {
     if (product == null) return Container();
-    iTongTien += product.price;
+
     return Container(
       height: 135,
       child: Card(
@@ -235,7 +236,7 @@ class _CartContainerState extends State<CartContainer> {
                       ),
                       Text("Giá : ${formatPrice(product.price)} đ",
                           style: TextStyle(fontSize: 12)),
-                      _buildQuanlityCart(product.quantity)
+                      _buildQuanlityCart(product.id, product.quantity)
                     ],
                   ),
                 ),
@@ -247,19 +248,10 @@ class _CartContainerState extends State<CartContainer> {
     );
   }
 
-  Widget _summaryCart(_iTongTien) {
+  Widget _summaryCart() {
     int value = 0;
     return Container(
-        child:
-            // StreamBuilder<Cart>(
-            //     stream: CartBloc.streamController.stream,
-            //     builder: (context, snapshot) {
-            //       if (snapshot.data == null || snapshot.data?.products.length == 0) {
-            //         return Container();
-            //       }
-            //       int price = snapshot.data?.price ?? 0;
-            //       return
-            Column(
+        child: Column(
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -269,7 +261,7 @@ class _CartContainerState extends State<CartContainer> {
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Colors.black)),
-            Text(_iTongTien,
+            Text(bloc.getTotalMoney().toString(),
                 style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
