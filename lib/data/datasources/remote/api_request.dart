@@ -29,30 +29,14 @@ class ApiRequest {
     });
   }
 
-  Future getProducts() async {
-    ReceivePort receivePort = ReceivePort();
-    Isolate.spawn((SendPort sendPort) {
-      _dio
-          .get(ApiConstant.PRODUCTS)
-          .then((value) => sendPort.send(value))
-          .catchError((error) => sendPort.send(error));
-    }, receivePort.sendPort);
-
-    return receivePort.first;
+  Future getProducts() {
+    return _dio.get(ApiConstant.PRODUCTS);
   }
 
-  Future getCart() async {
+  Future getCart() {
     String sToken = AppCache.getString(VariableConstant.TOKEN);
-    ReceivePort receivePort = ReceivePort();
-    Isolate.spawn((SendPort sendPort) {
-      _dio
-          .get(ApiConstant.GET_CART,
-              options: Options(headers: {"Authorization": "Bearer $sToken"}))
-          .then((value) => sendPort.send(value))
-          .catchError((error) => sendPort.send(error));
-    }, receivePort.sendPort);
-
-    return receivePort.first;
+    return _dio.get(ApiConstant.GET_CART,
+        options: Options(headers: {"Authorization": "Bearer $sToken"}));
   }
 
   Future addToCart(String idProduct) {
@@ -82,17 +66,10 @@ class ApiRequest {
         options: Options(headers: {"Authorization": "Bearer $sToken"}));
   }
 
-  Future getHistoryCart() async {
+  Future getHistoryCart() {
     String sToken = AppCache.getString(VariableConstant.TOKEN);
-    ReceivePort receivePort = ReceivePort();
-    Isolate.spawn((SendPort sendPort) {
-      _dio
-          .get(ApiConstant.HISTORY_CART,
-              options: Options(headers: {"Authorization": "Bearer $sToken"}))
-          .then((value) => sendPort.send(value))
-          .catchError((error) => sendPort.send(error));
-    }, receivePort.sendPort);
 
-    return receivePort.first;
+    return _dio.get(ApiConstant.HISTORY_CART,
+        options: Options(headers: {"Authorization": "Bearer $sToken"}));
   }
 }

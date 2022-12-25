@@ -69,6 +69,10 @@ class _CartContainerState extends State<CartContainer> {
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               return Text("Data is error");
+            } else if (!snapshot.hasData ||
+                snapshot.data == null ||
+                snapshot.data?.length == 0) {
+              return Center(child: _showEmpty());
             } else if (snapshot.hasData) {
               return Column(
                 children: [
@@ -97,7 +101,7 @@ class _CartContainerState extends State<CartContainer> {
                                 child: ElevatedButton(
                                   onPressed: () {
                                     bloc.eventSink
-                                        .add(ConfirmCart(status: true));
+                                        .add(ConfirmCart(status: false));
                                   },
                                   child: Text("Tạo đơn hàng",
                                       style: TextStyle(
@@ -109,23 +113,31 @@ class _CartContainerState extends State<CartContainer> {
                 ],
               );
             } else {
-              return _showEmpty();
+              return Center(child: _showEmpty());
             }
           }),
       LoadingWidget(child: Container(), bloc: bloc),
-      // ProgressListenerWidget<CartBloc>(
-      //   child: Container(),
-      //   callback: (event) {
-      //     switch (event.runtimeType) {
-      //       case SuccessEvent:
-      //         showSnackBar(context, "Tạo đơn hàng thành công");
-      //         break;
-      //       case FailEvent:
-      //         showSnackBar(context, (event as FailEvent).message);
-      //         break;
-      //     }
-      //   },
-      // )
+      ProgressListenerWidget<CartBloc>(
+        child: Container(),
+        callback: (event) {
+          String msg = "";
+          bool callHomePage = false;
+          switch (event.runtimeType) {
+            case ConfirmSuccessEvent:
+              msg = "Tạo đơn hàng thành công";
+              callHomePage = true;
+              break;
+            case UpdateSuccessEvent:
+              msg = "Đã cập nhật số lượng sản phẩm";
+              break;
+            case FailEvent:
+              msg = (event as FailEvent).message;
+              break;
+          }
+          showSnackBar(context, msg);
+          Navigator.pushNamedAndRemoveUntil(context, "home", (route) => false);
+        },
+      )
     ]);
   }
 
@@ -155,7 +167,7 @@ class _CartContainerState extends State<CartContainer> {
         Flexible(
             flex: 4,
             child: Image.asset(
-              "assets/images/cart48.png",
+              "assets/images/noproduct.png",
               width: 200,
             ))
       ],
@@ -173,7 +185,7 @@ class _CartContainerState extends State<CartContainer> {
           child: TextButton(
             onPressed: () {
               bloc.eventSink
-                  .add(UpdateCart(idProduct: id, Quantity: soluong - 1));
+                  .add(UpdateCart(idProduct: id, quantity: soluong - 1));
             },
             child: Text(
               "-",
@@ -191,7 +203,7 @@ class _CartContainerState extends State<CartContainer> {
           child: TextButton(
             onPressed: () {
               bloc.eventSink
-                  .add(UpdateCart(idProduct: id, Quantity: soluong + 1));
+                  .add(UpdateCart(idProduct: id, quantity: soluong + 1));
             },
             child: Text(
               "+",
@@ -261,7 +273,7 @@ class _CartContainerState extends State<CartContainer> {
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Colors.black)),
-            Text(bloc.getTotalMoney().toString(),
+            Text("${formatPrice(bloc.getTotalMoney())} đ",
                 style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,

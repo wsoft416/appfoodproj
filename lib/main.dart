@@ -1,4 +1,6 @@
 import 'package:appp_sale_29092022/data/datasources/local/cache/app_cache.dart';
+import 'package:appp_sale_29092022/presentation/features/history/history_detail.dart';
+import 'package:appp_sale_29092022/presentation/features/history/history_page.dart';
 import 'package:appp_sale_29092022/presentation/features/home/home_page.dart';
 import 'package:appp_sale_29092022/presentation/features/sign_in/sign_in_page.dart';
 import 'package:appp_sale_29092022/presentation/features/sign_up/sign_up_page.dart';
@@ -17,7 +19,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'App food',
       theme: ThemeData(),
       routes: {
         "sign-in": (context) => SignInPage(),
@@ -25,6 +27,8 @@ class MyApp extends StatelessWidget {
         "splash": (context) => SplashPage(),
         "home": (context) => HomePage(),
         "cart": (context) => CartPage(),
+        "history": (context) => HistoryPage(),
+        "history-detail": (context) => HistoryDtlPage(),
       },
       initialRoute: "splash",
     );

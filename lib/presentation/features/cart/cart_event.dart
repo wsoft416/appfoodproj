@@ -6,17 +6,17 @@ class FetchCartEvent extends BaseEvent {
 }
 
 class UpdateCart extends BaseEvent {
-  String idProduct;
-  int Quantity;
+  final String idProduct;
+  final int quantity;
 
-  UpdateCart({required this.idProduct, required this.Quantity});
+  UpdateCart({required this.idProduct, required this.quantity});
 
   @override
   List<Object?> get props => [];
 }
 
 class ConfirmCart extends BaseEvent {
-  bool status = false;
+  final bool status;
 
   ConfirmCart({required this.status});
 
@@ -24,12 +24,12 @@ class ConfirmCart extends BaseEvent {
   List<Object?> get props => [];
 }
 
-class HistoryCart extends BaseEvent {
+class ConfirmSuccessEvent extends BaseEvent {
   @override
   List<Object?> get props => [];
 }
 
-class SuccessEvent extends BaseEvent {
+class UpdateSuccessEvent extends BaseEvent {
   @override
   List<Object?> get props => [];
 }

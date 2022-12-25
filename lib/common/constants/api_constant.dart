@@ -9,6 +9,7 @@ class ApiConstant {
   static final String ADD_CART = "cart/add";
   static final String GET_CART = "cart";
   static final String CONFIRM_CART = "cart/conform";
-  static final String HISTORY_CART = "order/history";
+  static final String HISTORY_CART = "cart";
+  //  "order/history"; //Nếu còn lỗi 404 thì sẽ gán cart để nộp bài -> nhờ thầy check lại
   static final String UPDATE_CART = "cart/update";
 }

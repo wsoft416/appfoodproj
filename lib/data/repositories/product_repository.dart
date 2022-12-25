@@ -77,12 +77,11 @@ class ProductRepository {
     return completer.future;
   }
 
-  Future<AppResource<CartDTO>> confirmCart(bool status) async {
-    Completer<AppResource<CartDTO>> completer = Completer();
+  Future<String> confirmCart(bool status) async {
+    Completer<String> completer = Completer();
     try {
       Response<dynamic> response = await _apiRequest.confirmCart(status);
-      AppResource<CartDTO> resourceCartDTO =
-          AppResource.fromJson(response.data, CartDTO.fromJson);
+      String resourceCartDTO = response.data["data"];
       completer.complete(resourceCartDTO);
     } on DioError catch (dioError) {
       completer.completeError(dioError.response?.data["message"]);
@@ -92,12 +91,12 @@ class ProductRepository {
     return completer.future;
   }
 
-  Future<AppResource<List<CartDTO>>> historyCart() async {
-    Completer<AppResource<List<CartDTO>>> completer = Completer();
+  Future<AppResource<CartDTO>> historyCart() async {
+    Completer<AppResource<CartDTO>> completer = Completer();
     try {
       Response<dynamic> response = await _apiRequest.getHistoryCart();
-      AppResource<List<CartDTO>> resourceCartDTO =
-          AppResource.fromJson(response.data, CartDTO.getListCartDTO);
+      AppResource<CartDTO> resourceCartDTO =
+          AppResource.fromJson(response.data, CartDTO.fromJson);
       completer.complete(resourceCartDTO);
     } on DioError catch (dioError) {
       completer.completeError(dioError.response?.data["message"]);

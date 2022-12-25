@@ -55,7 +55,7 @@ class CartBloc extends BaseBloc {
       iTotalMoney = cartDTO.price!;
 
       List<ProductDTO> listProductDTO =
-          ProductDTO.parserListProducts(cartDTO.products!) ?? List.empty();
+          ProductDTO.parserListProducts(cartDTO.products!);
       List<Product> listProduct = listProductDTO.map((e) {
         return Product(
             e.id, e.name, e.address, e.price, e.img, e.quantity, e.gallery);
@@ -72,9 +72,9 @@ class CartBloc extends BaseBloc {
     loadingSink.add(true);
     try {
       AppResource<CartDTO> resourceCartDTO =
-          await _productRepository.updateCart(event.idProduct, event.Quantity);
+          await _productRepository.updateCart(event.idProduct, event.quantity);
       if (resourceCartDTO.data == null) return;
-      progressSink.add(SuccessEvent());
+      progressSink.add(UpdateSuccessEvent());
       loadingSink.add(false);
     } catch (e) {
       progressSink.add(FailEvent(message: e.toString()));
@@ -82,13 +82,11 @@ class CartBloc extends BaseBloc {
     }
   }
 
-  void _executeConfirmCart(ConfirmCart event) async {
+  void _executeConfirmCart(ConfirmCart event) {
     loadingSink.add(true);
     try {
-      AppResource<CartDTO> resourceCartDTO =
-          await _productRepository.confirmCart(event.status);
-      if (resourceCartDTO.data == null) return;
-      progressSink.add(SuccessEvent());
+      _productRepository.confirmCart(event.status);
+      progressSink.add(ConfirmSuccessEvent());
       loadingSink.add(false);
     } catch (e) {
       progressSink.add(FailEvent(message: e.toString()));
