@@ -129,6 +129,7 @@ class _CartContainerState extends State<CartContainer> {
               break;
             case UpdateSuccessEvent:
               msg = "Đã cập nhật số lượng sản phẩm";
+              callHomePage = true;
               break;
             case FailEvent:
               msg = (event as FailEvent).message;
